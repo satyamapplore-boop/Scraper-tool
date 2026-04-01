@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applore | CRM Ready Verification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+    <style>
+        :root {
+            --primary: #10b981; 
+            --bg: #0a0a0a;
+            --surface: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-blur: 25px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; background-image: radial-gradient(circle at 50% 0%, #111827 0%, #0a0a0a 100%); min-height: 100vh; }
+        .container { max-width: 1800px; width: 100%; margin: 0 auto; padding: 2rem; }
+
+        header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
+        .logo { font-family: 'Outfit', sans-serif; font-size: 2.2rem; font-weight: 700; background: linear-gradient(135deg, #34d399, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { color: var(--text-dim); font-size: 0.9rem; margin-top: 0.25rem; border-left: 2px solid var(--primary); padding-left: 1rem; }
+
+        .btn-group { display: flex; gap: 0.75rem; }
+        .btn { background: var(--surface); border: 1px solid var(--border); border-radius: 2rem; padding: 0.7rem 1.5rem; color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: 0.3s; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; }
+        .btn:hover { background: var(--primary); color: #000; transform: translateY(-2px); border-color: var(--primary); }
+
+        .dashboard-layout { display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; }
+        .sidebar { background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); border: 1px solid var(--border); border-radius: 1.5rem; padding: 1.5rem; position: sticky; top: 1rem; height: calc(100vh - 120px); overflow-y: auto; }
+        .filter-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--primary); letter-spacing: 1.5px; margin-bottom: 1rem; display: block; }
+        .filter-list { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 2rem; }
+        .filter-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.8rem; cursor: pointer; color: var(--text-dim); transition: 0.2s; }
+        .filter-item input { accent-color: var(--primary); width: 18px; height: 18px; }
+
+        .main-card { background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); border: 1px solid var(--border); border-radius: 1.5rem; padding: 1.5rem; }
+        .search-box { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 2rem; padding: 0.8rem 1.5rem; color: #fff; width: 100%; outline: none; margin-bottom: 1.5rem; font-family: inherit; }
+
+        .table-container { overflow-x: auto; border-radius: 1rem; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; min-width: 1400px; text-align: left; }
+        th { background: rgba(16, 185, 129, 0.05); color: var(--primary); padding: 1rem; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border); }
+        td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .badge { padding: 0.3rem 0.6rem; border-radius: 0.5rem; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; display: inline-block; background: var(--surface); color: var(--text-dim); border: 1px solid transparent; }
+        .badge-verified { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
+        .link-url { color: #34d399; text-decoration: none; font-size: 0.75rem; border: 1px solid rgba(16, 185, 129, 0.2); padding: 0.25rem 0.5rem; border-radius: 0.4rem; background: rgba(16, 185, 129, 0.05); white-space: nowrap; }
+        .link-url:hover { background: var(--primary); color: #000; border-color: var(--primary); }
+
+        .non-ai-tag { font-size: 0.6rem; background: rgba(16, 185, 129, 0.1); color: var(--primary); padding: 0.3rem 0.6rem; border-radius: 2rem; margin-bottom: 1.5rem; display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <div class="logo">Applore CRM Logic</div>
+                <div class="subtitle">Ensuring 100% Field Purity & One-Lead-Per-Row Database</div>
+            </div>
+            <div class="btn-group">
+                <a href="leads_refined.csv" download class="btn">Download Final CSV</a>
+                <a href="leads_refined.xlsx" download class="btn">Final Excel Audit</a>
+            </div>
+        </header>
+
+        <div class="dashboard-layout">
+            <aside class="sidebar">
+                <span class="filter-title">Geo Target</span>
+                <div id="continentFilters" class="filter-list"></div>
+                <span class="filter-title">Restrict Industries</span>
+                <div id="industryFilters" class="filter-list"></div>
+            </aside>
+
+            <div class="main-card">
+                <div class="non-ai-tag">🛡️ CRM FIELD PURITY ACTIVE: No Mixed Data, URLs, or Generic Records.</div>
+                <input type="text" id="searchInput" class="search-box" placeholder="Quick search from 300+ unique real-world leads...">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Company Name</th>
+                                <th>Contact Name</th>
+                                <th>Title</th>
+                                <th>Email</th>
+                                <th>Verification Status</th>
+                                <th>Website</th>
+                                <th>Industry</th>
+                                <th>Country</th>
+                                <th>Staff</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leadsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CSV_FILE = 'leads_refined.csv';
+        let allLeads = [];
+
+        function init() {
+            Papa.parse(CSV_FILE, {
+                download: true, header: true, skipEmptyLines: true,
+                complete: (results) => {
+                    allLeads = results.data;
+                    generateFilters();
+                    filterAndRender();
+                }
+            });
+            document.getElementById('searchInput').oninput = filterAndRender;
+        }
+
+        function generateFilters() {
+            const industries = ["Manufacturing", "Healthcare", "Financial Services", "Retail & E-commerce", "Information Technology", "Logistics & Supply Chain", "Real Estate & Construction", "Energy & Utilities", "Education & EdTech", "Consumer Goods & FMCG"];
+            const continents = ["Europe", "North America", "Asia"];
+            const contCont = document.getElementById('continentFilters');
+            const indCont = document.getElementById('industryFilters');
+
+            continents.forEach(cont => {
+                const div = document.createElement('label');
+                div.className = 'filter-item';
+                div.innerHTML = `<input type="checkbox" name="continent" value="${cont}" ${cont === 'Europe' ? 'checked' : ''} onchange="filterAndRender()"> ${cont}`;
+                contCont.appendChild(div);
+            });
+
+            industries.forEach(ind => {
+                const div = document.createElement('label');
+                div.className = 'filter-item';
+                div.innerHTML = `<input type="checkbox" name="industry" value="${ind}" checked onchange="filterAndRender()"> ${ind}`;
+                indCont.appendChild(div);
+            });
+        }
+
+        function filterAndRender() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const selectedInds = Array.from(document.querySelectorAll('input[name="industry"]:checked')).map(i => i.value);
+            const filtered = allLeads.filter(l => {
+                const matchSearch = Object.values(l).some(v => String(v).toLowerCase().includes(searchTerm));
+                const matchInd = selectedInds.includes(l.sector);
+                return matchSearch && matchInd;
+            });
+            renderTable(filtered);
+        }
+
+        function renderTable(data) {
+            const body = document.getElementById('leadsBody'); body.innerHTML = '';
+            data.forEach((l) => {
+                const tr = document.createElement('tr');
+                const isV = String(l.email_verified).toLowerCase() === 'true';
+                tr.innerHTML = `
+                    <td style="font-weight:700">${l.company_name}</td>
+                    <td>${l.contact_name}</td>
+                    <td style="color:var(--primary);font-size:0.7rem;font-weight:700">${l.title}</td>
+                    <td>${l.email || '—'}</td>
+                    <td><span class="badge ${isV ? 'badge-verified' : ''}">${isV ? '✓ VERIFIED' : 'PENDING'}</span></td>
+                    <td><a href="${l.website}" target="_blank" class="link-url">${l.website ? l.website.replace('https://','') : ''} ↗</a></td>
+                    <td style="font-size:0.75rem">${l.sector}</td>
+                    <td style="font-weight:600">${l.country}</td>
+                    <td style="opacity:0.6;font-size:0.7rem">${l.employees}</td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+        window.onload = init;
+    </script>
+</body>
+</html>

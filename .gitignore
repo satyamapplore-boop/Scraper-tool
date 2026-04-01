@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data files
+*.json
+*.csv
+*.xlsx
+*.log
+
+# Environment variables
+.env
+
+# Secrets
+/email_cache.json
+/leads_raw.json 
+/leads_raw_backup_*.json
+/leads_refined.csv
+/leads_refined.xlsx
+/leads_signals.csv
+/leads_yc_run_*.json
+/pipeline_output.csv
+/scraper_*.log
+/signals.json
+
+# IDE / System
+.DS_Store
+.claude/
+.vscode/
+
+# Local exports
+/exports/
