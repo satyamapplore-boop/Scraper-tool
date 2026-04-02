@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Applore | CRM Ready Verification</title>
+    <title>Lead Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
     <style>
@@ -15,159 +15,258 @@
             --text-main: #e2e8f0;
             --text-dim: #94a3b8;
             --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-blur: 25px;
+            --danger: #ef4444;
+            --warning: #f59e0b;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; background-image: radial-gradient(circle at 50% 0%, #111827 0%, #0a0a0a 100%); min-height: 100vh; }
-        .container { max-width: 1800px; width: 100%; margin: 0 auto; padding: 2rem; }
+        body { background-color: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 1.5rem; }
 
-        header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
-        .logo { font-family: 'Outfit', sans-serif; font-size: 2.2rem; font-weight: 700; background: linear-gradient(135deg, #34d399, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitle { color: var(--text-dim); font-size: 0.9rem; margin-top: 0.25rem; border-left: 2px solid var(--primary); padding-left: 1rem; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+        .logo { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+        .btn { background: var(--surface); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.5rem 1rem; color: #fff; cursor: pointer; font-size: 0.8rem; }
+        .btn:hover { background: var(--primary); color: #000; }
 
-        .btn-group { display: flex; gap: 0.75rem; }
-        .btn { background: var(--surface); border: 1px solid var(--border); border-radius: 2rem; padding: 0.7rem 1.5rem; color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: 0.3s; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; }
-        .btn:hover { background: var(--primary); color: #000; transform: translateY(-2px); border-color: var(--primary); }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+        .stat-card { background: var(--glass-bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .stat-label { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; }
+        .stat-card.danger .stat-value { color: var(--danger); }
+        .stat-card.warning .stat-value { color: var(--warning); }
 
-        .dashboard-layout { display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; }
-        .sidebar { background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); border: 1px solid var(--border); border-radius: 1.5rem; padding: 1.5rem; position: sticky; top: 1rem; height: calc(100vh - 120px); overflow-y: auto; }
-        .filter-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--primary); letter-spacing: 1.5px; margin-bottom: 1rem; display: block; }
-        .filter-list { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 2rem; }
-        .filter-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.8rem; cursor: pointer; color: var(--text-dim); transition: 0.2s; }
-        .filter-item input { accent-color: var(--primary); width: 18px; height: 18px; }
+        .main-layout { display: grid; grid-template-columns: 240px 1fr; gap: 1rem; }
 
-        .main-card { background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); border: 1px solid var(--border); border-radius: 1.5rem; padding: 1.5rem; }
-        .search-box { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 2rem; padding: 0.8rem 1.5rem; color: #fff; width: 100%; outline: none; margin-bottom: 1.5rem; font-family: inherit; }
+        .sidebar { background: var(--glass-bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; height: fit-content; max-height: calc(100vh - 250px); overflow-y: auto; }
+        .filter-section { margin-bottom: 1.25rem; }
+        .filter-title { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--primary); margin-bottom: 0.5rem; }
+        .filter-list { display: flex; flex-direction: column; gap: 0.4rem; }
+        .filter-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--text-dim); cursor: pointer; }
+        .filter-item:hover { color: var(--primary); }
+        .filter-item input { accent-color: var(--primary); width: 14px; height: 14px; }
 
-        .table-container { overflow-x: auto; border-radius: 1rem; border: 1px solid var(--border); }
-        table { width: 100%; border-collapse: collapse; min-width: 1400px; text-align: left; }
-        th { background: rgba(16, 185, 129, 0.05); color: var(--primary); padding: 1rem; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border); }
-        td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
+        .main-card { background: var(--glass-bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; }
+        .toolbar { display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+        .search-box { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.5rem 1rem; color: #fff; width: 100%; max-width: 300px; font-size: 0.85rem; }
+        .select-box { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.4rem 0.75rem; color: #fff; font-size: 0.8rem; }
+        .select-box option { background: var(--bg); }
+
+        .table-wrap { overflow-x: auto; border-radius: 0.5rem; border: 1px solid var(--border); max-height: 500px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background: rgba(16,185,129,0.1); color: var(--primary); padding: 0.75rem; font-size: 0.6rem; text-transform: uppercase; position: sticky; top: 0; text-align: left; }
+        td { padding: 0.75rem; border-bottom: 1px solid var(--border); font-size: 0.75rem; }
         tr:hover td { background: rgba(255,255,255,0.02); }
 
-        .badge { padding: 0.3rem 0.6rem; border-radius: 0.5rem; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; display: inline-block; background: var(--surface); color: var(--text-dim); border: 1px solid transparent; }
-        .badge-verified { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
-        .link-url { color: #34d399; text-decoration: none; font-size: 0.75rem; border: 1px solid rgba(16, 185, 129, 0.2); padding: 0.25rem 0.5rem; border-radius: 0.4rem; background: rgba(16, 185, 129, 0.05); white-space: nowrap; }
-        .link-url:hover { background: var(--primary); color: #000; border-color: var(--primary); }
+        .badge { padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; }
+        .badge-verified { background: rgba(16,185,129,0.2); color: #10b981; }
+        .badge-false { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .link-url { color: #34d399; text-decoration: none; font-size: 0.7rem; }
 
-        .non-ai-tag { font-size: 0.6rem; background: rgba(16, 185, 129, 0.1); color: var(--primary); padding: 0.3rem 0.6rem; border-radius: 2rem; margin-bottom: 1.5rem; display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .pagination { display: flex; justify-content: center; gap: 0.25rem; margin-top: 1rem; }
+        .page-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 0.25rem; padding: 0.3rem 0.6rem; color: var(--text-dim); cursor: pointer; font-size: 0.7rem; }
+        .page-btn:hover { background: var(--primary); color: #000; }
+        .page-btn.active { background: var(--primary); color: #000; }
+        .page-btn:disabled { opacity: 0.4; }
+
+        .empty-state { text-align: center; padding: 2rem; color: var(--text-dim); }
+        .loading { text-align: center; padding: 2rem; color: var(--primary); }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div>
-                <div class="logo">Applore CRM Logic</div>
-                <div class="subtitle">Ensuring 100% Field Purity & One-Lead-Per-Row Database</div>
-            </div>
-            <div class="btn-group">
-                <a href="leads_refined.csv" download class="btn">Download Final CSV</a>
-                <a href="leads_refined.xlsx" download class="btn">Final Excel Audit</a>
-            </div>
+            <div class="logo">Lead Dashboard</div>
+            <button class="btn" onclick="exportCSV()">Export</button>
         </header>
 
-        <div class="dashboard-layout">
+        <div class="stats-row">
+            <div class="stat-card"><div class="stat-value" id="totalLeads">0</div><div class="stat-label">Total Leads</div></div>
+            <div class="stat-card"><div class="stat-value" id="emailAvailable">0</div><div class="stat-label">Has Email</div></div>
+            <div class="stat-card warning"><div class="stat-value" id="emailMissing">0</div><div class="stat-label">No Email</div></div>
+            <div class="stat-card"><div class="stat-value" id="verifiedCount">0</div><div class="stat-label">Verified</div></div>
+            <div class="stat-card"><div class="stat-value" id="usaCount">0</div><div class="stat-label">USA</div></div>
+            <div class="stat-card"><div class="stat-value" id="europeCount">0</div><div class="stat-label">Europe</div></div>
+            <div class="stat-card"><div class="stat-value" id="globalCount">0</div><div class="stat-label">Global</div></div>
+        </div>
+
+        <div class="main-layout">
             <aside class="sidebar">
-                <span class="filter-title">Geo Target</span>
-                <div id="continentFilters" class="filter-list"></div>
-                <span class="filter-title">Restrict Industries</span>
-                <div id="industryFilters" class="filter-list"></div>
+                <div class="filter-section">
+                    <div class="filter-title">Region</div>
+                    <div class="filter-list" id="regionFilters"></div>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-title">Industry</div>
+                    <div class="filter-list" id="industryFilters"></div>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-title">Email</div>
+                    <div class="filter-list" id="emailFilters"></div>
+                </div>
             </aside>
 
             <div class="main-card">
-                <div class="non-ai-tag">🛡️ CRM FIELD PURITY ACTIVE: No Mixed Data, URLs, or Generic Records.</div>
-                <input type="text" id="searchInput" class="search-box" placeholder="Quick search from 300+ unique real-world leads...">
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Company Name</th>
-                                <th>Contact Name</th>
-                                <th>Title</th>
-                                <th>Email</th>
-                                <th>Verification Status</th>
-                                <th>Website</th>
-                                <th>Industry</th>
-                                <th>Country</th>
-                                <th>Staff</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leadsBody"></tbody>
-                    </table>
+                <div class="toolbar">
+                    <input type="text" id="searchInput" class="search-box" placeholder="Search...">
+                    <select id="pageSizeSelect" class="select-box" onchange="updatePageSize()">
+                        <option value="25">25</option>
+                        <option value="50" selected>50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span style="font-size:0.75rem;color:var(--text-dim)" id="recordCount">Loading...</span>
                 </div>
+                <div class="table-wrap" id="tableContainer"><div class="loading">Loading...</div></div>
+                <div class="pagination" id="pagination"></div>
             </div>
         </div>
     </div>
 
     <script>
-        const CSV_FILE = 'leads_refined.csv';
-        let allLeads = [];
+        const FIXED_INDUSTRIES = ["Manufacturing", "Healthcare", "Financial Services", "Retail & E-commerce", "Information Technology", "Logistics & Supply Chain", "Real Estate & Construction", "Energy & Utilities", "Education", "Consumer Goods"];
+        const REGIONS = ["USA", "Europe", "Global"];
 
-        function init() {
-            Papa.parse(CSV_FILE, {
-                download: true, header: true, skipEmptyLines: true,
-                complete: (results) => {
-                    allLeads = results.data;
+        let allLeads = [];
+        let filteredLeads = [];
+        let currentPage = 1;
+        let pageSize = 50;
+
+        function loadData() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'leads.csv', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var results = Papa.parse(xhr.responseText, { header: true, skipEmptyLines: true });
+                    allLeads = results.data.filter(function(l) { return l.company_name; });
                     generateFilters();
-                    filterAndRender();
+                    updateStats();
+                    applyFilters();
+                } else if (xhr.readyState === 4 && xhr.status === 404) {
+                    document.getElementById('tableContainer').innerHTML = '<div class="empty-state">leads.csv not found. Run lead_scraper.py first.</div>';
                 }
-            });
-            document.getElementById('searchInput').oninput = filterAndRender;
+            };
+            xhr.send();
         }
 
         function generateFilters() {
-            const industries = ["Manufacturing", "Healthcare", "Financial Services", "Retail & E-commerce", "Information Technology", "Logistics & Supply Chain", "Real Estate & Construction", "Energy & Utilities", "Education & EdTech", "Consumer Goods & FMCG"];
-            const continents = ["Europe", "North America", "Asia"];
-            const contCont = document.getElementById('continentFilters');
-            const indCont = document.getElementById('industryFilters');
-
-            continents.forEach(cont => {
-                const div = document.createElement('label');
-                div.className = 'filter-item';
-                div.innerHTML = `<input type="checkbox" name="continent" value="${cont}" ${cont === 'Europe' ? 'checked' : ''} onchange="filterAndRender()"> ${cont}`;
-                contCont.appendChild(div);
+            var regionCont = document.getElementById('regionFilters');
+            REGIONS.forEach(function(r) {
+                regionCont.innerHTML += '<label class="filter-item"><input type="checkbox" name="region" value="'+r+'" checked onchange="applyFilters()"> '+r+'</label>';
             });
 
-            industries.forEach(ind => {
-                const div = document.createElement('label');
-                div.className = 'filter-item';
-                div.innerHTML = `<input type="checkbox" name="industry" value="${ind}" checked onchange="filterAndRender()"> ${ind}`;
-                indCont.appendChild(div);
+            var industryCont = document.getElementById('industryFilters');
+            FIXED_INDUSTRIES.forEach(function(i) {
+                industryCont.innerHTML += '<label class="filter-item"><input type="checkbox" name="industry" value="'+i+'" checked onchange="applyFilters()"> '+i+'</label>';
             });
+
+            var emailCont = document.getElementById('emailFilters');
+            emailCont.innerHTML += '<label class="filter-item"><input type="checkbox" name="email" value="yes" checked onchange="applyFilters()"> Has Email</label>';
+            emailCont.innerHTML += '<label class="filter-item"><input type="checkbox" name="email" value="no" checked onchange="applyFilters()"> No Email</label>';
+            emailCont.innerHTML += '<label class="filter-item"><input type="checkbox" name="email" value="verified" checked onchange="applyFilters()"> Verified Only</label>';
         }
 
-        function filterAndRender() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const selectedInds = Array.from(document.querySelectorAll('input[name="industry"]:checked')).map(i => i.value);
-            const filtered = allLeads.filter(l => {
-                const matchSearch = Object.values(l).some(v => String(v).toLowerCase().includes(searchTerm));
-                const matchInd = selectedInds.includes(l.sector);
-                return matchSearch && matchInd;
-            });
-            renderTable(filtered);
+        function updateStats() {
+            var hasEmail = allLeads.filter(function(l) { return l.email && l.email.trim(); }).length;
+            var verified = allLeads.filter(function(l) { return String(l.email_verified).toUpperCase() === 'TRUE'; }).length;
+            
+            document.getElementById('totalLeads').textContent = allLeads.length;
+            document.getElementById('emailAvailable').textContent = hasEmail;
+            document.getElementById('emailMissing').textContent = allLeads.length - hasEmail;
+            document.getElementById('verifiedCount').textContent = verified;
+            document.getElementById('usaCount').textContent = allLeads.filter(function(l) { return l.region === 'USA'; }).length;
+            document.getElementById('europeCount').textContent = allLeads.filter(function(l) { return l.region === 'Europe'; }).length;
+            document.getElementById('globalCount').textContent = allLeads.filter(function(l) { return l.region === 'Global'; }).length;
         }
 
-        function renderTable(data) {
-            const body = document.getElementById('leadsBody'); body.innerHTML = '';
-            data.forEach((l) => {
-                const tr = document.createElement('tr');
-                const isV = String(l.email_verified).toLowerCase() === 'true';
-                tr.innerHTML = `
-                    <td style="font-weight:700">${l.company_name}</td>
-                    <td>${l.contact_name}</td>
-                    <td style="color:var(--primary);font-size:0.7rem;font-weight:700">${l.title}</td>
-                    <td>${l.email || '—'}</td>
-                    <td><span class="badge ${isV ? 'badge-verified' : ''}">${isV ? '✓ VERIFIED' : 'PENDING'}</span></td>
-                    <td><a href="${l.website}" target="_blank" class="link-url">${l.website ? l.website.replace('https://','') : ''} ↗</a></td>
-                    <td style="font-size:0.75rem">${l.sector}</td>
-                    <td style="font-weight:600">${l.country}</td>
-                    <td style="opacity:0.6;font-size:0.7rem">${l.employees}</td>
-                `;
-                body.appendChild(tr);
+        function applyFilters() {
+            var search = document.getElementById('searchInput').value.toLowerCase();
+            var regions = Array.from(document.querySelectorAll('input[name="region"]:checked')).map(function(i) { return i.value; });
+            var industries = Array.from(document.querySelectorAll('input[name="industry"]:checked')).map(function(i) { return i.value; });
+            var emailOpts = Array.from(document.querySelectorAll('input[name="email"]:checked')).map(function(i) { return i.value; });
+
+            filteredLeads = allLeads.filter(function(l) {
+                var searchMatch = !search || Object.values(l).some(function(v) { return String(v).toLowerCase().includes(search); });
+                var regionMatch = regions.includes(l.region);
+                var industryMatch = industries.includes(l.Sector);
+                
+                var hasEmail = l.email && l.email.trim();
+                var isVerified = String(l.email_verified).toUpperCase() === 'TRUE';
+                
+                var emailMatch = false;
+                if (emailOpts.includes("yes") && hasEmail) emailMatch = true;
+                if (emailOpts.includes("no") && !hasEmail) emailMatch = true;
+                if (emailOpts.includes("verified") && isVerified) emailMatch = true;
+
+                return searchMatch && regionMatch && industryMatch && emailMatch;
             });
+
+            currentPage = 1;
+            renderTable();
+            document.getElementById('recordCount').textContent = filteredLeads.length + ' / ' + allLeads.length;
         }
-        window.onload = init;
+
+        function renderTable() {
+            var start = (currentPage - 1) * pageSize;
+            var pageData = filteredLeads.slice(start, start + pageSize);
+            
+            if (!pageData.length) {
+                document.getElementById('tableContainer').innerHTML = '<div class="empty-state">No results</div>';
+                return;
+            }
+
+            var html = '<table><thead><tr>';
+            html += '<th>Company</th><th>Contact</th><th>Title</th><th>Email</th><th>Verified</th>';
+            html += '<th>Website</th><th>Country</th><th>Region</th><th>Industry</th>';
+            html += '</tr></thead><tbody>';
+
+            pageData.forEach(function(l) {
+                var verified = String(l.email_verified).toUpperCase() === 'TRUE';
+                var badge = verified ? '<span class="badge badge-verified">TRUE</span>' : '<span class="badge badge-false">FALSE</span>';
+                var web = l.website ? '<a href="'+l.website+'" target="_blank" class="link-url">Link</a>' : '-';
+                
+                html += '<tr>';
+                html += '<td>'+(l.company_name || '-')+'</td>';
+                html += '<td>'+(l.contact_name || '-')+'</td>';
+                html += '<td>'+(l.title || '-')+'</td>';
+                html += '<td>'+(l.email || '-')+'</td>';
+                html += '<td>'+badge+'</td>';
+                html += '<td>'+web+'</td>';
+                html += '<td>'+(l.country || '-')+'</td>';
+                html += '<td>'+(l.region || '-')+'</td>';
+                html += '<td>'+(l.Sector || '-')+'</td>';
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('tableContainer').innerHTML = html;
+            renderPagination();
+        }
+
+        function renderPagination() {
+            var total = Math.ceil(filteredLeads.length / pageSize);
+            var html = '';
+            if (total > 1) {
+                html += '<button class="page-btn" onclick="goToPage('+(currentPage-1)+')" '+(currentPage===1?'disabled':'')+'>Prev</button>';
+                for (var i = Math.max(1, currentPage-2); i <= Math.min(total, currentPage+2); i++) {
+                    html += '<button class="page-btn '+(i===currentPage?'active':'')+'" onclick="goToPage('+i+')">'+i+'</button>';
+                }
+                html += '<button class="page-btn" onclick="goToPage('+(currentPage+1)+')" '+(currentPage===total?'disabled':'')+'>Next</button>';
+            }
+            document.getElementById('pagination').innerHTML = html;
+        }
+
+        function goToPage(p) { currentPage = p; renderTable(); }
+        function updatePageSize() { pageSize = parseInt(document.getElementById('pageSizeSelect').value); currentPage = 1; renderTable(); }
+        
+        function exportCSV() {
+            var csv = Papa.unparse(filteredLeads);
+            var blob = new Blob([csv], {type: 'text/csv'});
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'leads_filtered.csv';
+            a.click();
+        }
+
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        window.onload = loadData;
     </script>
 </body>
 </html>

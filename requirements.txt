@@ -1,0 +1,11 @@
+requests
+beautifulsoup4
+pandas
+tqdm
+fake-useragent
+python-dotenv
+pyyaml
+dnspython
+selenium
+undetected-chromedriver
+openpyxl

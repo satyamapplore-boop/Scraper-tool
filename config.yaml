@@ -1,0 +1,116 @@
+# Scraper Tool Configuration
+
+# Logging
+log_level: INFO
+log_file: scraper.log
+log_max_bytes: 10485760  # 10MB
+log_backup_count: 5
+
+# Rate Limiting
+delay_min: 1.0
+delay_max: 2.5
+max_retries: 3
+retry_backoff: 1.5
+timeout: 15
+
+# Output Settings
+output_dir: output
+date_format: "%Y-%m-%d_%H-%M-%S"
+
+# Target Countries
+target_countries:
+  - United Kingdom
+  - Germany
+  - Netherlands
+  - Sweden
+  - Denmark
+  - Norway
+  - France
+  - Spain
+
+# Target Sectors
+target_sectors:
+  - health-care
+  - financial-services
+  - fin-tech
+  - health-tech
+  - software
+  - saas
+  - enterprise-software
+  - information-technology
+  - manufacturing
+  - industrials
+  - retail
+  - logistics
+
+# Non-tech-native sectors
+non_tech_native_sectors:
+  - manufacturing
+  - industrials
+  - retail
+  - logistics
+  - supply-chain
+  - real-estate
+  - construction
+  - agriculture
+  - legal
+  - education
+  - media
+  - publishing
+  - hospitality
+  - food-and-beverage
+  - energy
+  - transportation
+  - healthcare
+  - professional-services
+  - accounting
+  - insurance
+
+# Target Titles (Decision Makers)
+target_titles:
+  - CTO
+  - Chief Technology Officer
+  - CPO
+  - Chief Product Officer
+  - VP Engineering
+  - VP of Engineering
+  - Head of Engineering
+  - Head of Product
+  - VP Product
+  - Co-Founder
+  - CEO
+  - Founder
+  - President
+  - Managing Director
+  - Chief Executive Officer
+  - COO
+  - Chief Operating Officer
+  - CMO
+  - Chief Marketing Officer
+  - VP Sales
+  - Head of Sales
+
+# Employee Range
+employee_range: "c_1_10,c_11_50,c_51_100,c_101_250,c_251_500"
+
+# Email Verification
+email_verification:
+  use_cache: true
+  cache_ttl_days: 7
+  deep_verify: true
+
+# Dashboard Settings
+dashboard:
+  auto_refresh: true
+  refresh_interval: 30
+  default_page_size: 50
+
+# Scoring Weights
+scoring:
+  new_cto_cpo: 40
+  series_a_b_raised: 35
+  new_cdo: 30
+  digital_transformation: 25
+  dev_jobs_posted: 20
+  ma_announced: 15
+  stacking_bonus_per_signal: 15
